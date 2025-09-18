@@ -92,7 +92,7 @@ def fix_partial_contigs(contigs, parsed_pdb):
 
   return new_contigs
 
-def fix_contigs(contigs,parsed_pdb):
+def fix_contigs(contigs,parsed_pdb, seed=None):
   def fix_contig(contig):
     INF = float("inf")
     X = contig.split("/")
@@ -108,7 +108,7 @@ def fix_contigs(contigs,parsed_pdb):
         elif "-" in x:
           (S,E) = (int(y) for y in x.split("-"))
         elif x.isnumeric():
-          S = E = int(x)      
+          S = E = int(x)
         new_x = ""
         c_,i_ = None,0
         for c, i in parsed_pdb["pdb_idx"]:
@@ -121,7 +121,9 @@ def fix_contigs(contigs,parsed_pdb):
             c_,i_ = c,i
         Y.append(new_x + f"-{i_}")
       elif "-" in x:
-        # sample length
+        # sample length - now uses seed for reproducible randomness per design
+        if seed is not None:
+          np.random.seed(seed)
         s,e = x.split("-")
         m = np.random.randint(int(s),int(e)+1)
         Y.append(f"{m}-{m}")
